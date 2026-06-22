@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 import lyrics_creator.transcriber as transcriber_mod
@@ -61,3 +60,24 @@ def test_transcribe_passes_fixed_config_and_args(tmp_path, monkeypatch):
     assert call["skip_trans"] is True
     assert call["clear_temp"] is True
     assert call["src_lang"] is None
+
+    # Assert fixed TranscriptionConfig values
+    config = lrcer.kwargs["transcription"]
+    assert config.whisper_model == "large-v3-turbo"
+    assert config.device == "cpu"
+    assert config.compute_type == "int8"
+
+
+def test_transcribe_forwards_nonnull_lang(tmp_path, monkeypatch):
+    FakeLRCer.instances = []
+    monkeypatch.setattr(transcriber_mod, "LRCer", FakeLRCer)
+    monkeypatch.chdir(tmp_path)
+    audio = tmp_path / "b.mp3"
+    audio.touch()
+
+    t = Transcriber(lang="pl")
+    t.transcribe(audio)
+
+    lrcer = FakeLRCer.instances[0]
+    call = lrcer.calls[0]
+    assert call["src_lang"] == "pl"
