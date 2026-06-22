@@ -15,7 +15,10 @@ def lrc_path_for(audio: Path) -> Path:
 def find_audio_files(root: Path) -> list[Path]:
     if root.is_file():
         return [root] if is_audio_file(root) else []
-    return sorted((p for p in root.rglob("*") if is_audio_file(p)), key=lambda p: p.name)
+    return sorted(
+        (p for p in root.rglob("*") if is_audio_file(p)),
+        key=lambda p: (p.name, str(p)),
+    )
 
 
 def needs_processing(audio: Path, overwrite: bool) -> bool:

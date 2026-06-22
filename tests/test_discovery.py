@@ -61,3 +61,13 @@ def test_needs_processing_true_when_no_lrc(tmp_path):
     audio = tmp_path / "song.mp3"
     audio.touch()
     assert needs_processing(audio, overwrite=False) is True
+
+
+def test_find_audio_files_deterministic_with_duplicate_names(tmp_path):
+    """Duplicate filenames in different dirs sort deterministically by path."""
+    (tmp_path / "x").mkdir()
+    (tmp_path / "y").mkdir()
+    (tmp_path / "x" / "track.mp3").touch()
+    (tmp_path / "y" / "track.mp3").touch()
+    found = find_audio_files(tmp_path)
+    assert found == [tmp_path / "x" / "track.mp3", tmp_path / "y" / "track.mp3"]
