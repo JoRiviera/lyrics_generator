@@ -5,7 +5,7 @@ from lyrics_creator.transcriber import Transcriber
 
 
 class FakeLRCer:
-    """Stand-in for openlrc.LRCer that writes the .lrc into cwd, like the real one."""
+    """Stand-in for openlrc.LRCer that deliberately writes the .lrc to cwd to exercise the defensive move fallback."""
 
     instances = []
 
@@ -19,7 +19,7 @@ class FakeLRCer:
             {"path": path, "src_lang": src_lang,
              "skip_trans": skip_trans, "clear_temp": clear_temp}
         )
-        # Real openlrc writes the .lrc to cwd, not necessarily beside source.
+        # FakeLRCer deliberately writes to cwd (different from real openlrc 1.6.3 which writes beside source) to exercise the defensive move fallback.
         produced = Path.cwd() / (Path(path).stem + ".lrc")
         produced.write_text("[00:01.00]hello\n", encoding="utf-8")
         return [produced]

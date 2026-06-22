@@ -77,3 +77,29 @@ def test_main_returns_nonzero_on_failure(tmp_path, monkeypatch):
 
     monkeypatch.setattr(cli, "run", fake_run)
     assert main([str(tmp_path)]) == 1
+
+
+def test_run_constructs_transcriber_with_lang(tmp_path, monkeypatch):
+    """Test that run() constructs Transcriber with the --lang parameter."""
+    (tmp_path / "test.mp3").touch()
+
+    class SpyTranscriber:
+        def __init__(self, lang=None, model="large-v3-turbo"):
+            self.lang = lang
+
+        def transcribe(self, audio: Path) -> Path:
+            out = audio.with_suffix(".lrc")
+            out.write_text("[00:01.00]test\n", encoding="utf-8")
+            return out
+
+    # Patch Transcriber at the module where it's imported from inside run()
+    import lyrics_creator.transcriber
+    monkeypatch.setattr(
+        "lyrics_creator.transcriber.Transcriber", SpyTranscriber
+    )
+
+    counts = run(tmp_path, lang="pl", overwrite=False, transcriber=None)
+
+    # Verify transcriber was created and recorded the lang
+    assert counts == {"done": 1, "skipped": 0, "failed": 0}
+    assert (tmp_path / "test.lrc").exists()

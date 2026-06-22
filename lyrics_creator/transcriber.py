@@ -25,6 +25,7 @@ class Transcriber:
         )
         produced = Path(results[0])
         target = audio.with_suffix(".lrc")
+        # openlrc 1.6.3 already writes the .lrc beside the source; this move is a defensive fallback for other output locations / future versions.
         if produced.resolve() != target.resolve():
             shutil.move(str(produced), str(target))
         return target
