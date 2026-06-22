@@ -1,0 +1,16 @@
+[project]
+name = "lyrics-creator"
+version = "0.1.0"
+description = "Generate synced .lrc lyrics from audio, offline, for Jellyfin"
+requires-python = ">=3.12"
+dependencies = ["openlrc"]
+
+[project.scripts]
+lyrics-creator = "lyrics_creator.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
